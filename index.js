@@ -19,8 +19,19 @@ exports.handler = (event, context, callback) => {
   const sql = 'SELECT * FROM alunos WHERE nome LIKE ?';
   const params = ['%' + nome + '%'];
   connection.query(sql, params, function (error, results, fields) {
-    if (error) throw error;
-    console.log(results);
+    if (error) {
+      console.log(error);
+        // Fechar a conexão com o banco de dados MySQL
+        connection.end();
+        // Retornar um status code 400 e informações adicionais sobre o erro
+        const response = {
+          statusCode: 400,
+          body: JSON.stringify({ error: 'Ocorreu um erro ao consultar aluno.' })
+        };
+        callback(null, response);
+      }
+    else{
+      console.log(results);
     // Fechar a conexão com o banco de dados MySQL
     connection.end();
     // Transformar os resultados em formato JSON
@@ -31,5 +42,7 @@ exports.handler = (event, context, callback) => {
       body: jsonResults
     };
     callback(null, response);
+    }
+    
   });
 };
